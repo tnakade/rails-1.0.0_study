@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-JP" lang="ja-JP">
+<head>
+  <title>Books</title>
+</head>
+<body>
+  <h1>Books</h1>
+  <table border="1" align="left">
+    <tr>
+      <th>ID</th>
+      <th>タイトル</th>
+      <th>著者</th>
+    </tr>
+    <% @books.each do |b| %>
+      <tr>
+        <td>
+          <%= b.id %>
+        </td>
+        <td>
+          <%= b.title %>
+        </td>
+        <td>
+          <%= b.author %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</body>
+</html>
