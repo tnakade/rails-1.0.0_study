@@ -18,21 +18,7 @@ $ docker run -it -p 3000:3000 hello_app
 - http://lvh.me:3000/books
 - http://lvh.me:3000/books/1
 
-## その他
-### Railsソースの場所
-`/usr/lib/ruby/gems/1.8/gems/`にある
-
-```
-# ls -l /usr/lib/ruby/gems/1.8/gems/
-total 28
-drwxr-xr-x  4 root root 4096 Oct  6 13:11 actionmailer-1.1.5
-drwxr-xr-x  5 root root 4096 Oct  6 13:11 actionpack-1.11.2
-drwxr-xr-x  5 root root 4096 Oct  6 13:11 actionwebservice-1.0.0
-drwxr-xr-x  5 root root 4096 Oct  6 13:11 activerecord-1.13.2
-drwxr-xr-x  3 root root 4096 Oct  6 13:11 activesupport-1.2.5
-drwxr-xr-x 11 root root 4096 Oct  6 13:11 rails-1.0.0
-drwxr-xr-x  6 root root 4096 Oct  6 13:07 rake-0.6.2
-```
+## Dockerコンテナ内での操作
 ### コンテナは起動するけどRailsアプリは起動したくない(コンテナ内から起動する)
 ```
 $ docker run -it -p 3000:3000 hello_app /bin/bash
@@ -70,4 +56,53 @@ $ docker cp /path/to/hoge <コンテナID>:/path/to/fuga/
 - コンテナ内からファイルを取り出したい
 ```
 $ docker cp <コンテナID>:/path/to/hoge /path/to/fuga/
+```
+
+### Railsソースの場所
+`/usr/lib/ruby/gems/1.8/gems/`にある
+
+```
+# ls -l /usr/lib/ruby/gems/1.8/gems/
+total 28
+drwxr-xr-x  4 root root 4096 Oct  6 13:11 actionmailer-1.1.5
+drwxr-xr-x  5 root root 4096 Oct  6 13:11 actionpack-1.11.2
+drwxr-xr-x  5 root root 4096 Oct  6 13:11 actionwebservice-1.0.0
+drwxr-xr-x  5 root root 4096 Oct  6 13:11 activerecord-1.13.2
+drwxr-xr-x  3 root root 4096 Oct  6 13:11 activesupport-1.2.5
+drwxr-xr-x 11 root root 4096 Oct  6 13:11 rails-1.0.0
+drwxr-xr-x  6 root root 4096 Oct  6 13:07 rake-0.6.2
+```
+
+## デバッグについて
+- 止めたい位置にブレークポイントを置く
+```
+class BookController < ApplicationController
+
+  def index
+    @books = Book.find(:all)
+    breakpoint "Stop the world"
+  end
+end
+```
+
+- アプリを操作してブレークポイントの位置で止める
+- 別のターミナルからコンテナに入る
+```
+$ docker exec -it <コンテナID> /bin/bash
+```
+
+- breakpointerを起動する
+```
+# cd hello_app/
+# ./script/breakpointer
+No connection to breakpoint service at druby://localhost:42531 (DRb::DRbConnError)
+Tries to connect will be made every 2 seconds...
+```
+
+- ブレークポイントを置いた位置まで動かす
+```
+Executing break point "Stop the world" at ./script/../config/../app/controllers/book_controller.rb:5 in `index'
+irb(#<BookController:0x7f59a54ead08>):001:0> @books
+=> [#<Book:0x7f59a54c92e8 @attributes={"title"=>"\343\201\212\351\207\221\343\201\214\350\262\257\343\201\276\343\202\213\344\272\272\343\200\201\350\262\257\343\201\276\343\202\211\343\201\252\343\201\204\344\272\272", "author"=>"\351\207\221\345\211\215 \345\244\252\351\203\216", "id"=>"1"}>, #<Book:0x7f59a54c9108 @attributes={"title"=>"\343\201\223\343\202\214\343\201\247\343\201\202\343\201\252\343\201\237\343\202\202\345\244\247\351\207\221\346\214\201\343\201\241!", "author"=>"\351\207\221\345\211\215 \345\244\252\351\203\216", "id"=>"2"}>, #<Book:0x7f59a54c9090 @attributes={"title"=>"\347\224\237\343\201\215\346\226\271\343\201\253\347\202\271\346\225\260\343\201\257\347\204\241\343\201\204\343\200\202", "author"=>"\345\206\205\346\263\242 \347\224\237\344\270\200", "id"=>"3"}>]
+irb(#<BookController:0x7f59a54ead08>):002:0> 
 ```
